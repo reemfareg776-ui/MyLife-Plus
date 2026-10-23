@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MyLife+</title>
+<style>
+:root{
+  --bg:#f3edfb; --panel:#ffffffcc; --panel-solid:#fff; --ink:#2a2347; --muted:#7d7499;
+  --line:#e8e0f5; --accent:#7c5cf0; --accent2:#c06be0; --pink:#ff8fb8; --green:#2fc08a;
+  --amber:#ffb35c; --shadow:0 6px 24px rgba(124,92,240,.12);
+  --hero:linear-gradient(120deg,#7c5cf0 0%,#c06be0 45%,#ff9d7a 100%);
+  color-scheme:light;
+}
+:root[data-theme="dark"]{
+  --bg:#171329; --panel:#221c3acc; --panel-solid:#221c3a; --ink:#efeaff; --muted:#a79fc4;
+  --line:#352d52; --shadow:0 6px 24px rgba(0,0,0,.35); color-scheme:dark;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Nunito","Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--ink);
+  background-image:radial-gradient(circle at 10% 0%,#e6d9ff55,transparent 40%),radial-gradient(circle at 90% 100%,#ffd6e855,transparent 40%);
+  min-height:100vh}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:10px}
+.app{display:grid;grid-template-columns:230px minmax(0,1fr) 290px;gap:16px;padding:16px;max-width:1500px;margin:auto}
+.card{background:var(--panel);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow)}
+
+/* sidebar */
+.side{padding:16px 12px;display:flex;flex-direction:column;gap:6px;position:sticky;top:16px;height:calc(100vh - 32px)}
+.logo{display:flex;align-items:center;gap:10px;padding:4px 8px 14px}
+.logo .mark{width:40px;height:40px;border-radius:14px;background:var(--hero);display:grid;place-items:center;color:#fff;font-size:20px}
+.logo b{font-size:22px;letter-spacing:-.5px}.logo small{display:block;color:var(--muted);font-size:11px}
+.nav button{width:100%;display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:14px;text-align:start}
+.nav button:hover{background:var(--line)}
+.nav button.on{background:linear-gradient(90deg,#7c5cf033,#c06be022);color:var(--accent);font-weight:700}
+.nav .ico{font-size:20px;width:26px;text-align:center}
+.nav small{display:block;color:var(--muted);font-size:11px;font-weight:400}
+.side .spacer{flex:1}
+.lang{padding:8px 10px;border:1px solid var(--line);border-radius:12px;background:var(--panel-solid);width:100%;color:var(--ink)}
+.me{display:flex;align-items:center;gap:10px;padding:10px;border-radius:14px;background:var(--panel-solid);border:1px solid var(--line)}
+.avatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#ffb6d5,#b69bff);display:grid;place-items:center;font-size:18px}
+
+/* main */
+.main{display:flex;flex-direction:column;gap:16px;min-width:0}
+.top{display:flex;gap:12px;align-items:center}
+.search{flex:1;display:flex;align-items:center;gap:10px;padding:11px 16px;border-radius:16px}
+.search input{border:0;background:none;flex:1;font:inherit;color:var(--ink);outline:none;min-width:0}
+.iconbtn{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;position:relative;font-size:18px}
+.iconbtn .dot{position:absolute;top:-4px;inset-inline-end:-4px;background:#ff5d8f;color:#fff;font-size:10px;border-radius:10px;padding:1px 6px}
+.hero{border-radius:24px;padding:30px 28px;color:#fff;background:var(--hero);position:relative;overflow:hidden;min-height:150px;box-shadow:var(--shadow)}
+.hero h1{font-size:34px;letter-spacing:-.5px}
+.hero p{opacity:.92;margin-top:6px}
+.hero .skyline{position:absolute;inset-inline-end:0;bottom:0;height:100%;width:55%;opacity:.45;pointer-events:none}
+.hero .verse{position:absolute;inset-inline-end:22px;top:20px;background:#ffffff33;border:1px solid #ffffff55;padding:10px 14px;border-radius:14px;max-width:210px;font-size:13px;backdrop-filter:blur(6px)}
+.hero .verse small{display:block;opacity:.85;margin-top:2px}
+
+.quick{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+.quick button{padding:12px 10px;border-radius:16px;display:flex;gap:10px;align-items:center;text-align:start}
+.quick button:hover{transform:translateY(-2px)}
+.quick .qi{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-size:19px;flex:none}
+.quick b{font-size:13px;display:block}.quick small{font-size:11px;color:var(--muted)}
+
+.row{display:grid;grid-template-columns:1.05fr 1.5fr 1fr 1fr;gap:12px}
+.pad{padding:16px}
+.h{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
+.h b{font-size:16px}.link{color:var(--accent);font-size:12px;font-weight:700}
+.task{display:flex;align-items:center;gap:10px;padding:7px 0;font-size:14px;width:100%;text-align:start}
+.task .box{width:22px;height:22px;border-radius:50%;border:2px solid var(--accent);display:grid;place-items:center;font-size:12px;color:#fff;flex:none}
+.task.done .box{background:var(--green);border-color:var(--green)}
+.task.done span.t{opacity:.65}
+.task time{margin-inline-start:auto;color:var(--muted);font-size:12px}
+.cheer{margin-top:8px;padding:10px;border-radius:12px;background:linear-gradient(90deg,#ffe3f0,#efe3ff);color:#a24cc4;font-size:12px;font-style:italic}
+:root[data-theme="dark"] .cheer{background:#3a2b57;color:#e0b8ff}
+
+.spirit{background:linear-gradient(160deg,#fff,#f3e8ff);overflow:hidden;position:relative}
+:root[data-theme="dark"] .spirit{background:linear-gradient(160deg,#2a2148,#3a2358)}
+.badge{background:#ffe9ef;color:#e0457b;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700}
+.rings{display:flex;gap:14px;margin:12px 0;padding:12px;border-radius:16px;background:var(--panel-solid);border:1px solid var(--line)}
+.ring{display:flex;align-items:center;gap:10px;flex:1}
+.ring svg{width:56px;height:56px;transform:rotate(-90deg);flex:none}
+.ring b{font-size:18px;display:block}.ring small{color:var(--muted);font-size:11px}
+.cta{width:100%;padding:11px;border-radius:12px;background:linear-gradient(90deg,#7c5cf0,#b46be8);color:#fff;font-weight:700}
+.cta:hover{filter:brightness(1.08)}
+.chips4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
+.chips4 button{padding:10px 4px;border-radius:14px;background:var(--panel-solid);border:1px solid var(--line);font-size:12px;display:grid;gap:4px;justify-items:center}
+.chips4 button span{font-size:20px}
+
+.donut{position:relative;width:130px;height:130px;margin:6px auto 10px}
+.donut svg{transform:rotate(-90deg)}
+.donut div{position:absolute;inset:0;display:grid;place-content:center;text-align:center}
+.donut b{font-size:20px}.donut small{color:var(--muted);font-size:11px}
+.leg{display:flex;justify-content:space-between;font-size:13px;padding:4px 0}
+.leg i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-inline-end:8px}
+
+.up{display:flex;gap:10px;align-items:center;padding:6px 0;font-size:13px}
+.up .th{width:48px;height:48px;border-radius:12px;display:grid;place-items:center;font-size:22px;flex:none}
+.up small{color:var(--muted);display:block}.up em{margin-inline-start:auto;font-style:normal;font-weight:700;font-size:12px}
+
+.mods{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.mod{overflow:hidden;text-align:start;display:block;width:100%}
+.mod:hover{transform:translateY(-3px)}
+.mod .pic{height:96px;display:grid;place-items:center;font-size:40px}
+.mod .in{padding:12px}
+.mod h3{font-size:15px;display:flex;gap:8px;align-items:center}
+.mod p{color:var(--muted);font-size:12px;margin:2px 0 8px}
+.mod ul{list-style:none;display:grid;gap:5px}
+.mod li{font-size:12px;padding:6px 8px;border-radius:9px;background:var(--bg)}
+.mod .go{display:block;text-align:center;padding:7px;border-radius:10px;margin-bottom:8px;font-size:12px;font-weight:700;background:linear-gradient(90deg,#ffe9c9,#ffd9ec);color:#8a4a2b}
+
+/* right */
+.right{display:flex;flex-direction:column;gap:14px}
+.ai .head{display:flex;gap:10px;align-items:center;margin-bottom:10px}
+.ai .head .avatar{width:46px;height:46px;font-size:24px}
+.bubble{background:var(--panel-solid);border:1px solid var(--line);border-radius:14px;padding:10px 12px;font-size:13px;margin-bottom:8px}
+.bubble.me{background:linear-gradient(90deg,#7c5cf0,#b46be8);color:#fff;border:0;margin-inline-start:30px}
+.chat{max-height:150px;overflow:auto}
+.sug{display:grid;gap:6px;margin:8px 0}
+.sug button{padding:8px 12px;border-radius:12px;background:#efe6ff;color:#5b3fc4;font-size:13px;text-align:start}
+:root[data-theme="dark"] .sug button{background:#35295a;color:#d9c9ff}
+.ask{display:flex;gap:6px;border:1px solid var(--line);border-radius:14px;padding:4px 4px 4px 12px;background:var(--panel-solid)}
+.ask input{flex:1;border:0;background:none;outline:none;font:inherit;color:var(--ink);min-width:0}
+.ask button{width:34px;height:34px;border-radius:50%;background:var(--accent);color:#fff}
+.notes label{display:flex;gap:10px;align-items:center;padding:6px 0;font-size:13px;cursor:pointer}
+.notes input[type=checkbox]{accent-color:var(--accent);width:16px;height:16px}
+.notes label:has(input:checked) span{text-decoration:line-through;opacity:.55}
+.trip{display:flex;gap:10px;align-items:center}
+.trip .th{width:70px;height:80px;border-radius:14px;background:linear-gradient(160deg,#7c5cf0,#ff9d7a);display:grid;place-items:center;font-size:30px;flex:none}
+.bar{height:7px;border-radius:7px;background:var(--line);overflow:hidden;margin:6px 0}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,#2fc08a,#7ce0b8)}
+
+/* pages */
+.page{display:none}.page.show{display:flex;flex-direction:column;gap:16px}
+.page h2{font-size:26px}
+.tools{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.feat{display:grid;gap:8px}
+.feat div{padding:12px;border-radius:12px;background:var(--panel-solid);border:1px solid var(--line);font-size:14px}
+.inline{display:flex;gap:8px;margin-top:10px}
+.inline input{flex:1;padding:9px 12px;border-radius:12px;border:1px solid var(--line);background:var(--panel-solid);color:var(--ink);font:inherit;min-width:0}
+.inline button{padding:9px 14px;border-radius:12px;background:var(--accent);color:#fff;font-weight:700}
+.big{font-size:56px;font-weight:800;text-align:center;margin:10px 0}
+.exp{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed var(--line);font-size:14px}
+
+.bottom{display:none}
+@media (max-width:1280px){
+  .app{grid-template-columns:200px minmax(0,1fr)}
+  .right{grid-column:1 / -1;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+  .row{grid-template-columns:1fr 1fr}.mods{grid-template-columns:repeat(3,1fr)}
+  .quick{grid-template-columns:repeat(3,1fr)}
+}
+@media (max-width:820px){
+  .app{grid-template-columns:1fr;padding:10px 10px 80px}
+  .side{display:none}
+  .row,.mods{grid-template-columns:1fr}.mods{grid-template-columns:1fr 1fr}
+  .hero h1{font-size:26px}.hero .verse{display:none}
+  .bottom{display:flex;position:fixed;bottom:0;inset-inline:0;background:var(--panel-solid);border-top:1px solid var(--line);justify-content:space-around;padding:8px 4px 12px;z-index:5}
+  .bottom button{display:grid;justify-items:center;font-size:11px;color:var(--muted);gap:2px}
+  .bottom button span{font-size:20px}.bottom button.on{color:var(--accent);font-weight:700}
+}
+@media (prefers-reduced-motion:no-preference){.quick button,.mod{transition:transform .2s}}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- SIDEBAR -->
+<aside class="card side">
+  <div class="logo"><div class="mark">🦋</div><div><b>MyLife+</b><small data-i="tag">Better Life, Together</small></div></div>
+  <nav class="nav" id="nav"></nav>
+  <div class="spacer"></div>
+  <select class="lang" id="lang" aria-label="Language">
+    <option value="en">🇬🇧 English</option><option value="ar">🇸🇦 العربية</option>
+  </select>
+  <div class="me"><div class="avatar">👩</div><div><b id="uname">Fatma</b><small style="display:block;color:var(--muted);font-size:11px">Dream • Plan • Do</small></div></div>
+</aside>
+
+<main class="main">
+  <div class="top">
+    <label class="card search"><span>🔍</span><input id="gsearch" placeholder="Search anything... (recipes, places, tasks, or ask AI)" aria-label="Search"></label>
+    <button class="card iconbtn" aria-label="Notifications">🔔<span class="dot">3</span></button>
+    <button class="card iconbtn" id="theme" aria-label="Toggle dark mode">🌙</button>
+    <div class="avatar" style="width:42px;height:42px">👩</div>
+  </div>
+
+  <!-- HOME -->
+  <section class="page show" id="p-home">
+    <div class="hero">
+      <svg class="skyline" viewBox="0 0 400 150" preserveAspectRatio="xMaxYMax slice" fill="#fff"><rect x="60" y="40" width="22" height="110"/><rect x="95" y="40" width="22" height="110"/><rect x="82" y="85" width="13" height="8"/><path d="M71 40l0-22 0 22M106 40v-22"/><rect x="150" y="90" width="90" height="60"/><path d="M150 90q45-60 90 0z"/><rect x="260" y="100" width="30" height="50"/><rect x="300" y="75" width="25" height="75"/><rect x="335" y="105" width="40" height="45"/></svg>
+      <h1><span id="greet">Good Evening</span>, <span class="nm">Fatma</span>! 🌙</h1>
+      <p data-i="slogan">Small steps every day, big dreams come true.</p>
+      <div class="verse">“And He is with you wherever you are.”<small>(Quran 57:4)</small></div>
+    </div>
+
+    <div class="quick" id="quick"></div>
+
+    <div class="row">
+      <div class="card pad">
+        <div class="h"><b data-i="overview">Today's Overview</b><span class="link" id="today"></span></div>
+        <div id="todayList"></div>
+        <div class="cheer">You're doing great! Keep going! 🌸</div>
+      </div>
+
+      <div class="card pad spirit">
+        <div class="h"><b data-i="spirit">Spiritual & Worship</b><span class="badge">In Progress</span></div>
+        <div class="rings">
+          <div class="ring"><svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="15" fill="none" stroke="var(--line)" stroke-width="4"/><circle id="ringI" cx="18" cy="18" r="15" fill="none" stroke="#2fc08a" stroke-width="4" stroke-linecap="round" stroke-dasharray="94.2" stroke-dashoffset="64"/></svg><div><small>Istighfar</small><b id="istTxt">320 / 1,000</b><small id="istPct">32%</small></div></div>
+          <div class="ring"><svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="15" fill="none" stroke="var(--line)" stroke-width="4"/><circle cx="18" cy="18" r="15" fill="none" stroke="#a46bf0" stroke-width="4" stroke-linecap="round" stroke-dasharray="94.2" stroke-dashoffset="87.6"/></svg><div><small>Quran Progress</small><b>Juz 1 • Page 12</b><small>7%</small></div></div>
+        </div>
+        <button class="cta" data-go="spirit">Continue Reading ›</button>
+        <div class="chips4"><button data-go="spirit"><span>☀️</span>Azkar</button><button data-go="spirit"><span>📿</span>Istighfar</button><button data-go="spirit"><span>📖</span>Quran</button><button data-go="spirit"><span>🤲</span>Duas</button></div>
+      </div>
+
+      <div class="card pad">
+        <div class="h"><b>Weekly Budget</b><span class="link" data-go="finance">View details</span></div>
+        <div class="donut"><svg viewBox="0 0 36 36" width="130" height="130"><circle cx="18" cy="18" r="15" fill="none" stroke="var(--line)" stroke-width="3.5"/><circle id="budRing" cx="18" cy="18" r="15" fill="none" stroke="#2fc08a" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="94.2" stroke-dashoffset="47"/></svg><div><b id="budSpent">RM 350</b><small>of RM 700</small><small id="budPct">50%</small></div></div>
+        <div id="budLegend"></div>
+      </div>
+
+      <div class="card pad">
+        <div class="h"><b>Upcoming</b><span class="link">View all</span></div>
+        <div class="up"><div class="th" style="background:#e3d9ff">🏙️</div><div>Visit Pavilion KL<small>Sat, 21 Oct</small></div><em>RM 120</em></div>
+        <div class="up"><div class="th" style="background:#ffe6cf">☕</div><div>Try new café<small>Sun, 22 Oct</small></div><em>RM 50</em></div>
+        <div class="up"><div class="th" style="background:#ffd9e8">📅</div><div>Plan content week<small>Mon, 23 Oct</small></div><em></em></div>
+        <div class="up"><div class="th" style="background:#d9f5e7">🛒</div><div>Grocery shopping<small>Tue, 24 Oct</small></div><em>RM 60</em></div>
+      </div>
+    </div>
+
+    <div class="mods" id="mods"></div>
+  </section>
+
+  <!-- MODULE PAGES -->
+  <section class="page" id="p-spirit">
+    <h2>🕌 Spiritual & Worship</h2>
+    <div class="tools">
+      <div class="card pad"><b>Istighfar counter</b>
+        <div class="big" id="istBig">320</div>
+        <div class="bar"><i id="istBar" style="width:32%;background:linear-gradient(90deg,#7c5cf0,#c06be0)"></i></div>
+        <div class="inline"><button id="istPlus" style="flex:1;padding:14px">Astaghfirullah +1</button><button id="istReset" style="background:var(--line);color:var(--ink)">Reset</button></div>
+        <p style="color:var(--muted);font-size:12px;margin-top:8px">Goal: 1,000 today.</p>
+      </div>
+      <div class="card pad"><b>Quran tracker</b>
+        <p style="margin:8px 0;color:var(--muted);font-size:13px">Page <span id="qPage">12</span> of 604 (<span id="qPct">2</span>%)</p>
+        <div class="bar"><i id="qBar" style="width:2%"></i></div>
+        <div class="inline"><button id="qNext" style="flex:1">I read a page +1</button><button id="qBack" style="background:var(--line);color:var(--ink)">−1</button></div>
+      </div>
+      <div class="card pad"><b>Daily azkar</b>
+        <div class="feat" style="margin-top:10px" id="azkar"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="page" id="p-planner">
+    <h2>📅 Planner & Productivity</h2>
+    <div class="tools">
+      <div class="card pad"><b>Task planner</b>
+        <div id="plTasks" style="margin-top:8px"></div>
+        <div class="inline"><input id="plIn" placeholder="Add a task..."><button id="plAdd">Add</button></div>
+      </div>
+      <div class="card pad"><b>Pomodoro timer</b>
+        <div class="big" id="pomo">25:00</div>
+        <div class="inline"><button id="pStart" style="flex:1">Start</button><button id="pReset" style="background:var(--line);color:var(--ink)">Reset</button></div>
+        <p style="color:var(--muted);font-size:12px;margin-top:8px">Focus 25 minutes, then rest 5.</p>
+      </div>
+      <div class="card pad"><b>Habit tracker</b>
+        <div id="habits" style="margin-top:8px"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="page" id="p-kitchen">
+    <h2>🍲 Kitchen & Inventory</h2>
+    <div class="tools">
+      <div class="card pad"><b>Inventory</b>
+        <div id="inv" style="margin-top:8px"></div>
+        <div class="inline"><input id="invIn" placeholder="Add an ingredient..."><button id="invAdd">Add</button></div>
+      </div>
+      <div class="card pad"><b>Cook with what I have</b>
+        <div class="inline"><button id="cookBtn" style="flex:1">Suggest recipes</button></div>
+        <div class="feat" id="recipes" style="margin-top:10px"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="page" id="p-travel">
+    <h2>✈️ Travel & Malaysia Guide</h2>
+    <div class="tools">
+      <div class="card pad"><b>Places & attractions</b><div class="feat" style="margin-top:10px"><div>🏙️ Petronas Towers & KLCC Park</div><div>🕌 National Mosque, Kuala Lumpur</div><div>🌿 Batu Caves</div><div>🏝️ Langkawi & Penang</div></div></div>
+      <div class="card pad"><b>Malaysia trip plan</b><p style="margin:8px 0;color:var(--muted);font-size:13px">Kuala Lumpur • 4 Days • 3 Nights</p>
+        <div class="bar"><i id="tripBar" style="width:60%"></i></div><p id="tripTxt" style="font-size:13px">60% planned</p>
+        <div class="inline"><button id="tripUp" style="flex:1">Mark next step done</button></div></div>
+    </div>
+  </section>
+
+  <section class="page" id="p-finance">
+    <h2>💰 Finance & Budgeting</h2>
+    <div class="tools">
+      <div class="card pad"><b>Add expense</b>
+        <div class="inline"><select id="exCat" class="lang"></select></div>
+        <div class="inline"><input id="exAmt" type="number" min="0" placeholder="Amount (RM)"><button id="exAdd">Add</button></div>
+        <div id="exList" style="margin-top:10px"></div>
+      </div>
+      <div class="card pad"><b>Savings goal</b>
+        <p style="margin:8px 0;color:var(--muted);font-size:13px">Weekly budget RM 700</p>
+        <div class="bar"><i id="finBar" style="width:50%"></i></div><p id="finTxt" style="font-size:13px"></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="page" id="p-content">
+    <h2>🎬 Content Creator Hub</h2>
+    <div class="tools">
+      <div class="card pad"><b>Idea generator</b>
+        <div class="inline"><button id="ideaBtn" style="flex:1">Give me an idea</button></div>
+        <div class="feat" id="idea" style="margin-top:10px"></div></div>
+      <div class="card pad"><b>Content planner</b><div id="cpl" style="margin-top:8px"></div>
+        <div class="inline"><input id="cplIn" placeholder="Plan a post..."><button id="cplAdd">Add</button></div></div>
+    </div>
+  </section>
+
+  <section class="page" id="p-ai">
+    <h2>✨ AI Assistant</h2>
+    <div class="card pad"><p style="color:var(--muted)">Use the assistant panel on the right (or below on small screens). It answers with quick preset suggestions in this demo version.</p></div>
+  </section>
+
+  <section class="page" id="p-settings">
+    <h2>⚙️ Settings</h2>
+    <div class="card pad"><b>Your name</b>
+      <div class="inline"><input id="nameIn" value="Fatma"><button id="nameSave">Save</button></div></div>
+  </section>
+</main>
+
+<!-- RIGHT -->
+<aside class="right">
+  <div class="card pad ai">
+    <div class="head"><div class="avatar">👧</div><div><b>AI Assistant ✨</b><small style="display:block;color:var(--muted)">Your personal helper</small></div></div>
+    <div class="chat" id="chat"><div class="bubble">Hi <span class="nm">Fatma</span>! 👋<br>How can I help you today?</div></div>
+    <div class="sug" id="sug"></div>
+    <div class="ask"><input id="askIn" placeholder="Ask me anything..." aria-label="Ask AI"><button id="askBtn" aria-label="Send">➤</button></div>
+  </div>
+  <div class="card pad notes">
+    <div class="h"><b>🗒️ Quick Notes</b><button class="link" id="noteAdd">+ Add</button></div>
+    <div id="notes"></div>
+  </div>
+  <div class="card pad">
+    <b>Malaysia Trip Plan</b>
+    <div class="trip" style="margin-top:10px"><div class="th">🏙️</div><div style="flex:1"><b>Kuala Lumpur</b><small style="display:block;color:var(--muted)">4 Days • 3 Nights</small><div class="bar"><i style="width:60%"></i></div><button class="cta" style="padding:7px" data-go="travel">Continue ›</button></div></div>
+  </div>
+</aside>
+</div>
+
+<div class="bottom" id="bottom"></div>
+
+<script>
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+const T = {
+  en:{tag:"Better Life, Together",slogan:"Small steps every day, big dreams come true.",overview:"Today's Overview",spirit:"Spiritual & Worship",
+      nav:["Home","Spiritual & Worship","Planner & Productivity","Kitchen & Inventory","Travel & Malaysia Guide","Finance & Budgeting","Content Creator","AI Assistant","Settings"],
+      greet:["Good Morning","Good Afternoon","Good Evening"]},
+  ar:{tag:"حياة أفضل، معًا",slogan:"خطوات صغيرة كل يوم، وأحلام كبيرة تتحقق.",overview:"نظرة على يومي",spirit:"الروحانيات والعبادات",
+      nav:["الرئيسية","الروحانيات والعبادات","إدارة الوقت والإنتاجية","المطبخ والمخزون","السفر ودليل ماليزيا","المالية والادخار","صناعة المحتوى","المساعد الذكي","الإعدادات"],
+      greet:["صباح الخير","مساء النور","مساء الخير"]}
+};
+const pages = ["home","spirit","planner","kitchen","travel","finance","content","ai","settings"];
+const icons = ["🏠","🕌","📅","🍲","✈️","💰","🎬","✨","⚙️"];
+const sub = ["","الروحانيات والعبادات","إدارة الوقت والإنتاجية","المطبخ والمخزون","السفر ودليل ماليزيا","المالية والادخار","صناعة المحتوى","المساعد الذكي","الإعدادات"];
+let lang="en";
+
+/* ---------- navigation ---------- */
+function go(p){
+  pages.forEach(x=>$("#p-"+x).classList.toggle("show",x===p));
+  $$("#nav button").forEach(b=>b.classList.toggle("on",b.dataset.p===p));
+  $$("#bottom button").forEach(b=>b.classList.toggle("on",b.dataset.p===p));
+  window.scrollTo({top:0});
+}
+function buildNav(){
+  $("#nav").innerHTML = pages.map((p,i)=>`<button data-p="${p}" class="${i==0?'on':''}"><span class="ico">${icons[i]}</span><span>${T[lang].nav[i]}${lang==="en"&&sub[i]?`<small>${sub[i]}</small>`:""}</span></button>`).join("");
+  $$("#nav button").forEach(b=>b.onclick=()=>go(b.dataset.p));
+  const bt=[["home","🏠","Home"],["planner","📅","Planner"],["finance","💰","Finance"],["travel","✈️","Travel"],["content","🎬","Content"]];
+  $("#bottom").innerHTML = bt.map(([p,i,l])=>`<button data-p="${p}"><span>${i}</span>${l}</button>`).join("");
+  $$("#bottom button").forEach(b=>b.onclick=()=>go(b.dataset.p));
+  $$("[data-go]").forEach(b=>b.onclick=()=>go(b.dataset.go));
+}
+$("#lang").onchange=e=>{
+  lang=e.target.value; document.documentElement.lang=lang; document.documentElement.dir = lang==="ar"?"rtl":"ltr";
+  $$("[data-i]").forEach(el=>el.textContent=T[lang][el.dataset.i]); buildNav(); greet();
+};
+function greet(){const h=new Date().getHours();$("#greet").textContent=T[lang].greet[h<12?0:h<17?1:2];}
+greet();
+$("#today").textContent = new Date().toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short",year:"numeric"});
+
+/* ---------- theme ---------- */
+$("#theme").onclick=()=>{
+  const r=document.documentElement, d=r.dataset.theme==="dark";
+  r.dataset.theme = d?"light":"dark"; $("#theme").textContent = d?"🌙":"☀️";
+};
+
+/* ---------- name ---------- */
+$("#nameSave").onclick=()=>{const n=$("#nameIn").value.trim()||"Fatma";$$(".nm").forEach(e=>e.textContent=n);$("#uname").textContent=n;};
+
+/* ---------- quick links ---------- */
+const quick=[["☀️","Azkar","Morning & Evening","spirit","#e7e0ff"],["📖","Quran","Track your Khatmah","spirit","#d9f5e7"],["🗓️","Plan My Time","AI suggests tasks","planner","#e7e0ff"],["🍳","Cook with Ingredients","Get recipes from your fridge","kitchen","#ffe6cf"],["👛","My Budget","Track & save money","finance","#ffe0cc"],["🧭","Malaysia Guide","Explore & Plan","travel","#d9ebff"],["💡","Content Ideas","Create & Grow","content","#ffd9e8"]].slice(0,6);
+$("#quick").innerHTML=quick.map(q=>`<button class="card" data-go="${q[3]}"><span class="qi" style="background:${q[4]}">${q[0]}</span><span><b>${q[1]}</b><small>${q[2]}</small></span></button>`).join("");
+
+/* ---------- today's list ---------- */
+const today=[["Fajr Prayer","5:45 AM",1],["Morning Azkar","Done ✓",1],["Quran Reading","Page 12 & 3",0],["University / Work","9:00 AM",0],["Gym","6:00 PM",0],["Plan content","8:00 PM",0]];
+function drawToday(){
+  $("#todayList").innerHTML=today.map((t,i)=>`<button class="task ${t[2]?'done':''}" data-i="${i}"><span class="box">${t[2]?"✓":""}</span><span class="t">${t[0]}</span><time>${t[1]}</time></button>`).join("");
+  $$("#todayList .task").forEach(b=>b.onclick=()=>{today[b.dataset.i][2]^=1;drawToday();});
+}
+drawToday();
+
+/* ---------- budget ---------- */
+const cats=[["Food",120,"#ff8fb8"],["Transport",50,"#7c5cf0"],["Activities",80,"#2fc08a"],["Shopping",60,"#ffb35c"],["Others",40,"#c06be0"]];
+const BUD=700;
+function drawBudget(){
+  const sp=cats.reduce((a,c)=>a+c[1],0), pct=Math.min(100,Math.round(sp/BUD*100));
+  $("#budSpent").textContent="RM "+sp; $("#budPct").textContent=pct+"%";
+  $("#budRing").style.strokeDashoffset=94.2*(1-pct/100);
+  $("#budRing").style.stroke = pct>85?"#ff5d8f":"#2fc08a";
+  $("#budLegend").innerHTML=cats.map(c=>`<div class="leg"><span><i style="background:${c[2]}"></i>${c[0]}</span><b>RM ${c[1]}</b></div>`).join("");
+  $("#finBar").style.width=pct+"%"; $("#finTxt").textContent=`RM ${sp} spent • RM ${Math.max(0,BUD-sp)} left`;
+  $("#exList").innerHTML=cats.map(c=>`<div class="exp"><span>${c[0]}</span><b>RM ${c[1]}</b></div>`).join("");
+}
+$("#exCat").innerHTML=cats.map((c,i)=>`<option value="${i}">${c[0]}</option>`).join("");
+$("#exAdd").onclick=()=>{const v=parseFloat($("#exAmt").value);if(v>0){cats[$("#exCat").value][1]+=v;$("#exAmt").value="";drawBudget();}};
+drawBudget();
+
+/* ---------- modules cards ---------- */
+const mods=[
+ ["⏱️","Time & Productivity","Focus • Plan • Achieve","linear-gradient(135deg,#ffd9a8,#ffb8c8)","💻","planner",["Free Time Optimizer","Task Planner","Pomodoro Timer","Habit Tracker"]],
+ ["🧑‍🍳","Kitchen & Inventory","Cook Smart • Eat Healthy","linear-gradient(135deg,#ffc9a0,#ff9d7a)","🍲","kitchen",["Scan Ingredients","Recipes & Meal Plan","Inventory Tracker","Quick Cooking Ideas"]],
+ ["✈️","Travel & Malaysia Guide","Explore • Experience • Save","linear-gradient(135deg,#9ad0ff,#b7a3ff)","🏙️","travel",["Travel Planner","Places & Attractions","Cafes & Restaurants","Cost Breakdown"]],
+ ["💰","Finance & Side Hustle","Grow • Save • Build","linear-gradient(135deg,#ffe29a,#ffb08a)","📱","finance",["Outing Budget Planner","Savings Goal Tracker","Side Hustle Tracker","Earnings Analytics"]],
+ ["🎬","Content Creator Hub","Create • Share • Grow","linear-gradient(135deg,#d3b3ff,#ff9ec7)","📷","content",["Content Planner","Idea Generator","Trends & Hashtags","Analytics"]]
+];
+$("#mods").innerHTML=mods.map(m=>`<button class="card mod" data-go="${m[5]}"><div class="pic" style="background:${m[3]}">${m[4]}</div><div class="in"><h3><span>${m[0]}</span>${m[1]}</h3><p>${m[2]}</p><span class="go">Explore ›</span><ul>${m[6].map(x=>`<li>${x}</li>`).join("")}</ul></div></button>`).join("");
+
+/* ---------- istighfar & quran ---------- */
+let ist=320, page=12;
+function drawIst(){
+  const p=Math.min(100,Math.round(ist/10));
+  $("#istTxt").textContent=ist.toLocaleString()+" / 1,000"; $("#istPct").textContent=p+"%";
+  $("#ringI").style.strokeDashoffset=94.2*(1-p/100); $("#istBig").textContent=ist; $("#istBar").style.width=p+"%";
+}
+$("#istPlus").onclick=()=>{ist=Math.min(1000,ist+1);drawIst();};
+$("#istReset").onclick=()=>{ist=0;drawIst();};
+function drawQ(){const p=Math.round(page/604*100);$("#qPage").textContent=page;$("#qPct").textContent=p;$("#qBar").style.width=p+"%";}
+$("#qNext").onclick=()=>{page=Math.min(604,page+1);drawQ();};
+$("#qBack").onclick=()=>{page=Math.max(1,page-1);drawQ();};
+drawIst();drawQ();
+const az=["Ayat al-Kursi","Surah Al-Ikhlas, Al-Falaq, An-Nas (3 times)","SubhanAllah wa bihamdih (100 times)","La ilaha illa Allah wahdahu la sharika lah (10 times)"];
+$("#azkar").innerHTML=az.map(a=>`<div>${a}</div>`).join("");
+
+/* ---------- planner ---------- */
+const plan=[["Finish presentation",0],["Call mom",0]];
+function drawPlan(){
+  $("#plTasks").innerHTML=plan.map((t,i)=>`<button class="task ${t[1]?'done':''}" data-i="${i}"><span class="box">${t[1]?"✓":""}</span><span class="t">${t[0]}</span></button>`).join("");
+  $$("#plTasks .task").forEach(b=>b.onclick=()=>{plan[b.dataset.i][1]^=1;drawPlan();});
+}
+$("#plAdd").onclick=()=>{const v=$("#plIn").value.trim();if(v){plan.push([v,0]);$("#plIn").value="";drawPlan();}};
+drawPlan();
+let sec=1500,tm=null;
+const fmt=s=>String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0");
+$("#pStart").onclick=()=>{
+  if(tm){clearInterval(tm);tm=null;$("#pStart").textContent="Start";return;}
+  $("#pStart").textContent="Pause";
+  tm=setInterval(()=>{sec--;$("#pomo").textContent=fmt(sec);if(sec<=0){clearInterval(tm);tm=null;$("#pStart").textContent="Start";}},1000);
+};
+$("#pReset").onclick=()=>{clearInterval(tm);tm=null;sec=1500;$("#pomo").textContent="25:00";$("#pStart").textContent="Start";};
+const habits=[["Drink 8 glasses of water",0],["Read 10 pages",0],["Walk 20 minutes",0]];
+function drawHabits(){
+  $("#habits").innerHTML=habits.map((t,i)=>`<button class="task ${t[1]?'done':''}" data-i="${i}"><span class="box">${t[1]?"✓":""}</span><span class="t">${t[0]}</span></button>`).join("");
+  $$("#habits .task").forEach(b=>b.onclick=()=>{habits[b.dataset.i][1]^=1;drawHabits();});
+}
+drawHabits();
+
+/* ---------- kitchen ---------- */
+const inv=["Eggs","Rice","Tomatoes","Onion"];
+function drawInv(){$("#inv").innerHTML=inv.map(x=>`<div class="exp"><span>${x}</span></div>`).join("");}
+$("#invAdd").onclick=()=>{const v=$("#invIn").value.trim();if(v){inv.push(v);$("#invIn").value="";drawInv();}};
+drawInv();
+$("#cookBtn").onclick=()=>{
+  const list=inv.map(x=>x.toLowerCase());
+  const r=[];
+  if(list.includes("eggs")&&list.includes("tomatoes"))r.push("🍳 Shakshuka (eggs + tomatoes)");
+  if(list.includes("rice")&&list.includes("eggs"))r.push("🍚 Egg fried rice");
+  if(list.includes("rice")&&list.includes("onion"))r.push("🍛 Onion rice pilaf");
+  if(!r.length)r.push("Add more ingredients to get ideas");
+  $("#recipes").innerHTML=r.map(x=>`<div>${x}</div>`).join("");
+};
+
+/* ---------- travel ---------- */
+let trip=60;
+$("#tripUp").onclick=()=>{trip=Math.min(100,trip+10);$("#tripBar").style.width=trip+"%";$("#tripTxt").textContent=trip+"% planned";};
+
+/* ---------- content ---------- */
+const ideas=["A day in my life as a student in KL","3 budget cafés you must try","My morning routine in 60 seconds","How I plan my week (with a free template)","Malaysia on RM 100 a day"];
+$("#ideaBtn").onclick=()=>{$("#idea").innerHTML=`<div>💡 ${ideas[Math.floor(Math.random()*ideas.length)]}</div>`;};
+const cpl=["Plan content week"];
+function drawCpl(){$("#cpl").innerHTML=cpl.map(x=>`<div class="exp"><span>${x}</span></div>`).join("");}
+$("#cplAdd").onclick=()=>{const v=$("#cplIn").value.trim();if(v){cpl.push(v);$("#cplIn").value="";drawCpl();}};
+drawCpl();
+
+/* ---------- AI assistant (preset answers) ---------- */
+const sugs={
+ "📅 Plan my day":"Here's a simple plan: 1) Fajr + azkar, 2) deep-focus study 9–11, 3) break + lunch, 4) Quran 10 pages, 5) gym at 6, 6) content at 8.",
+ "🍲 Suggest recipes":"With eggs, tomatoes and rice you can make shakshuka or egg fried rice. Open Kitchen to see more.",
+ "✈️ Travel recommendations":"Start with KLCC, Batu Caves and Jalan Alor for food. Then add a day trip to Genting or Melaka.",
+ "💰 Budgeting tips":"Use the 50/30/20 rule: needs, wants, savings. Track every expense for one week first.",
+ "📚 Study & productivity tips":"Study in 25-minute blocks (Pomodoro), put your phone away, and review notes the same day.",
+ "🎬 Create content ideas":"Try: 'A day in my life', '3 budget cafés', or 'How I plan my week'."
+};
+$("#sug").innerHTML=Object.keys(sugs).map(k=>`<button>${k}</button>`).join("");
+function say(q,a){
+  const c=$("#chat");
+  c.insertAdjacentHTML("beforeend",`<div class="bubble me">${q}</div><div class="bubble">${a}</div>`);
+  c.scrollTop=c.scrollHeight;
+}
+$$("#sug button").forEach(b=>b.onclick=()=>say(b.textContent,sugs[b.textContent]));
+function ask(){
+  const v=$("#askIn").value.trim(); if(!v)return;
+  $("#askIn").value="";
+  say(v.replace(/</g,"&lt;"),"This demo gives preset answers. Connect a real AI API to answer anything.");
+}
+$("#askBtn").onclick=ask; $("#askIn").onkeydown=e=>{if(e.key==="Enter")ask();};
+
+/* ---------- quick notes ---------- */
+const notes=["Buy groceries","Finish presentation","Call mom","Read 10 pages Quran","Plan next trip to Penang"];
+function drawNotes(){$("#notes").innerHTML=notes.map(n=>`<label><input type="checkbox"><span>${n}</span></label>`).join("");}
+$("#noteAdd").onclick=()=>{const v=prompt("New note:");if(v){notes.push(v);drawNotes();}};
+drawNotes();
+
+buildNav();
+</script>
+</body>
+</html>
